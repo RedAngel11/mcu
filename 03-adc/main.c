@@ -4,9 +4,10 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "led-task/led-task.h"
+#include "adc-task/adc-task.h"
 
-#define DEVICE_NAME "Ksusha-pico-device"
-#define DEVICE_VRSN "v2.2.8"
+#define DEVICE_NAME "my-pico-device"
+#define DEVICE_VRSN "v0.0.1"
 
 void version_callback(const char* args)
 {
@@ -15,17 +16,17 @@ void version_callback(const char* args)
 
 void led_on_callback(const char* args) {
     led_task_state_set(LED_STATE_ON);
-    printf("LED turned ON :)\n");
+    printf("LED turned ON\n");
 }
 
 void led_off_callback(const char* args) {
     led_task_state_set(LED_STATE_OFF);
-    printf("LED turned OFF :(\n");
+    printf("LED turned OFF\n");
 }
 
 void led_blink_callback(const char* args) {
     led_task_state_set(LED_STATE_BLINK);
-    printf("LED blinking started tuc-tuc\n");
+    printf("LED blinking started\n");
 }
 
 void led_blink_set_period_ms_callback(const char* args) {
@@ -42,9 +43,7 @@ void led_blink_set_period_ms_callback(const char* args) {
 }
 
 void help_callback(const char* args);
-void hello(const char* args){
-    printf("hello world!");
-}
+
 void mem_callback(const char* args) {
     uint32_t addr = 0;
     
@@ -74,6 +73,26 @@ void wmem_callback(const char* args) {
     printf("Written 0x%08X to address 0x%08X\n", value, addr);
 }
 
+void get_adc_callback(const char* args) {
+    float voltage = adc_task_measure_voltage();
+    printf("%f\n", voltage);
+}
+
+void get_temp_callback(const char* args) {
+    float temperature = adc_task_measure_temperature();
+    printf("%f\n", temperature  );
+}
+
+void tm_start_callback(const char* args) {
+    adc_task_set_state(ADC_TASK_STATE_RUN);
+    printf("Telemetry started\n");
+}
+
+void tm_stop_callback(const char* args) {
+    adc_task_set_state(ADC_TASK_STATE_IDLE);
+    printf("Telemetry stopped\n");
+}
+
 api_t device_api[] = {
     {"help", help_callback, "show this help message"},
     {"version", version_callback, "get device name and firmware version"},
@@ -83,8 +102,11 @@ api_t device_api[] = {
     {"led_blink_set_period_ms", led_blink_set_period_ms_callback, "set blink period in milliseconds"},
     {"mem", mem_callback, "read memory word at address (mem <addr>)"},
     {"wmem", wmem_callback, "write memory word at address (wmem <addr> <value>)"},
-    {"hello", hello, "say hello"},
-    {NULL, NULL, NULL},
+    {"get_adc", get_adc_callback, "measure voltage on GPIO 26"},
+    {"get_temp", get_temp_callback, "measure internal temperature"},
+    {"tm_start", tm_start_callback, "start telemetry (continuous measurements)"},
+    {"tm_stop", tm_stop_callback, "stop telemetry"},
+    {NULL, NULL, NULL}
 };
 
 void help_callback(const char* args) {
@@ -99,6 +121,7 @@ void help_callback(const char* args) {
 
 int main()
 {
+    adc_task_init();
     stdio_init_all();
     stdio_task_init();
     led_task_init();
@@ -108,5 +131,6 @@ int main()
         char* command_string = stdio_task_handle();
         protocol_task_handle(command_string);
         led_task_handle();
+        adc_task_handle();
     }
 }

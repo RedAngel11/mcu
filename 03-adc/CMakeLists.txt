@@ -9,7 +9,7 @@ set(PICO_PLATFORM rp2040)
 include(pico_sdk_import.cmake)
 
 # Создаем проект. Аргументом указывается имя проекта - типовая строчка для любого CMakeLists.txt
-project(02-control)
+project(03_adc)
 
 # Вызываем функцию инициализации Pico SDK - специфика сборки под Pico
 pico_sdk_init()
@@ -20,11 +20,14 @@ add_executable(${PROJECT_NAME}
 	${CMAKE_CURRENT_SOURCE_DIR}/stdio-task/stdio-task.c
 	${CMAKE_CURRENT_SOURCE_DIR}/protocol-task/protocol-task.c
 	${CMAKE_CURRENT_SOURCE_DIR}/led-task/led-task.c
+	${CMAKE_CURRENT_SOURCE_DIR}/adc-task/adc-task.c
 )
 
 # Указываем на какие библиотеки ссылается наш код - типовая строчка для любого CMakeLists.txt
 target_link_libraries(${PROJECT_NAME}
 	pico_stdlib
+	hardware_gpio
+	hardware_adc
 )
 
 # Указываем файл, в котором находится линкер скрипт - специфика сборки под МК
