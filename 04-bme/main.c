@@ -1,9 +1,9 @@
-#include "stdio-task/stdio-task.h"
+#include "include/stdio-task.h"
 #include "protocol-task.h"
 #include "pico/stdlib.h"
 #include "stdio.h"
 #include "stdlib.h"
-#include "led-task/led-task.h"
+#include "include/led-task.h"
 #include "hardware/i2c.h"
 #include "bme280-driver.h"
 
